@@ -2,11 +2,12 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Say Hello</title>
+    <title>Movie Posters download</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-    <img src="https://raw.githubusercontent.com/MariyaSha/SimpleGreetingApp/main/logo.png">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/1200px-Amazon_Web_Services_Logo.svg.png">
+
     <br>
     <form action="greet" method="post">
         {% for message in get_flashed_messages() %}
@@ -15,7 +16,7 @@
         <br>
         <input type="text" name="name_input">
         <br>
-        <input type="submit" value="GREET" id="greet">
+        <input type="submit" value="SEARCH POSTER" id="greet">
     </form>
 </body>
 </html>

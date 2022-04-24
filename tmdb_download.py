@@ -1,12 +1,37 @@
 import imdb
 import os
 import requests
+from flask import Flask, request, json, Response
+import logging as log
+import instraction
+import pymongo
+global single_image_url
+image_url=[]
 
+#import instraction
+movie_name=""
 CONFIG_PATTERN = 'http://api.themoviedb.org/3/configuration?api_key=495e2304d9d84754f516ad3e5f1e23c1'
 IMG_PATTERN = 'http://api.themoviedb.org/3/movie/{imdbid}/images?api_key=495e2304d9d84754f516ad3e5f1e23c1'
 KEY = '495e2304d9d84754f516ad3e5f1e23c1'
+#####################################################  pymongo part ######################################
+# import gridfs
+#db = MongoClient().gridfs_example
+#fs = gridfs.GridFS(db)
+client = pymongo.MongoClient('localhost', 5000)
+mydb=client["movie_poster"]
+mycol=mydb["posters"]
+print (mydb.list_collection_names())
+dataone={"name":"ezoo","sur":"attrash"}
+datalist=[{"name":"hiba","sur":"najjar"}]
+#x=mycol.insert_many(datalist)
+#print (x.inserted_ids)
+#for x in mycol.find({"name" :"hiba"},{"_id":0}) :
+#    print (x.values())
+#instraction.write(dataone)
+##################################################end of pymongo#####################################3
 
 
+############################################### downloading  posters ##################################
 def _get_json(url):
     r = requests.get(url)
     return r.json()
@@ -23,6 +48,8 @@ def _download_images(urls, path='.'):
             filepath = os.path.join(path, filename)
             with open(filepath, 'wb') as w:
              w.write(r.content)
+             image_url.append(url)
+             return url
         else :
             continue
 
@@ -95,6 +122,15 @@ def final_download(movie_name):
     id = movies[0].getID()
     movie = moviesDB.get_movie(id)
     print("tt",id,sep="")
-    tmdb_posters("tt"+id)
+    urls=[tmdb_posters("tt"+id)]
+    ########################################  trying to write json to db from inside download images
+    for nr, url in enumerate(urls):
+        if nr==10:
+            urls=url
 
-    return movie_name
+        else :
+            continue
+    datalist = {"name": movie_name, "id":id,"url":image_url[-1]}
+    x2 = mycol.insert_one(datalist)
+    single_image_url=image_url[-1]
+    return (single_image_url)
