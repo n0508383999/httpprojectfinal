@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, flash
 import pymongo
 import tmdb_download
+import gridfs
+
 client = pymongo.MongoClient('localhost', 5000)
 mydb=client["movie_poster"]
 mycol=mydb["posters"]
@@ -23,7 +25,24 @@ def greeter():
 		url=(x["url"])
 	print(movie_n)
 	print(sss)
-	#urrlss=tmdb_download.single_image_url
+	######  gridfs part - storing the image in mongodb ########3
+	# Create an object of GridFs for the above database.
+	fs = gridfs.GridFS(mydb)
+
+	# define an image object with the location.
+	file = "poster_0.jpeg"
+
+	# Open the image in read-only format.
+	with open(file, 'rb') as f:
+		contents = f.read()
+
+	# Now store/put the image via GridFs object.
+	fs.put(contents, filename=sss)
+	gout = fs.get_last_version(sss)
+	fout = open("lastimg.jpg", 'wb')
+	fout.write(gout.read())
+	fout.close()
+	gout.close()
 	return render_template("greetold.html",poster_name=movie_n)
 ##################################################################################################################################
 ############################################ tmd download content ##########
